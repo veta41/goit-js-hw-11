@@ -29,11 +29,15 @@ refs.formSearch.addEventListener('submit', onSubmitForm);
 
 function onSubmitForm(e) {
   e.preventDefault();
+  
   observer.unobserve(refs.scroll);
   
   refs.gallery.innerHTML = '';
   page = 1;
   searchQuery = e.target.elements.searchQuery.value;
+  e.currentTarget.reset();
+  
+
   if (searchQuery === '') {
     return Notiflix.Notify.failure("Sorry, you didn't write anything");
   }
@@ -54,14 +58,17 @@ function onSubmitForm(e) {
     
       lightbox.refresh();
       observer.observe(refs.scroll);
-      onPageScrolling();
+      
     })
     .catch(console.log);
 }
 
 function onObserver(entries) {
+
+  
   entries.forEach(entry => {
     console.log(entry);
+    
     if (entry.isIntersecting) {
       page += 1;
 
@@ -69,7 +76,7 @@ function onObserver(entries) {
         .then(response => {
             makeImageMarkup(response.data.hits);
           lightbox.refresh();
-
+          onPageScrolling()
           if (page * 40 > response.data.totalHits) {
             observer.unobserve(refs.scroll);
             return Notiflix.Notify.failure(
